@@ -2,8 +2,8 @@
 #include "scuttle.h"
 #include <stdio.h>
 
-static char testname[256];
-static size_t testname_sz = 256;
+static char _scuttle_testname[256];
+static size_t _scuttle_testname_sz = 256;
 
 int main(int argc, char **argv)
 {
@@ -11,6 +11,8 @@ int main(int argc, char **argv)
     size_t msgbufsz = 1024;
     int failct = 0;
 
+    printf("This is Scuttle, v%s\n", SCUTTLE_VERSION_STRING);
+    printf("\tinteger version representation %d\n", SCUTTLE_VERSION_INT);
     printf("TEST_COUNT is %u\n", TEST_COUNT);
 
     for (int i = 0; i < TEST_COUNT; i++)
@@ -20,12 +22,12 @@ int main(int argc, char **argv)
         switch(result)
         {
             case 1:
-                fprintf(stderr, "Test %s failed:\n\t%s\n", testname, msgbuf);
+                fprintf(stderr, "Test %s failed:\n\t%s\n", _scuttle_testname, msgbuf);
                 failct++;
                 break;
             case 0:
             default:
-                fprintf(stderr, "Test %s passed\n", testname);
+                fprintf(stderr, "Test %s passed\n", _scuttle_testname);
                 break;
         }
         msgbuf[0] = '\0';
@@ -34,130 +36,130 @@ int main(int argc, char **argv)
     printf("*** RESULT:\n\t%d tests\t%d failures\t%0.2f%% pass rate\n", TEST_COUNT, failct, 100.0f * ((float)(TEST_COUNT - failct) / (float)TEST_COUNT));
 }
 
-int assert_true_passes(char *msgbuf, size_t bufsz)
+int assert_true_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     SASSERT(1 == 1)
     return 0;
 }
 
-int assert_false_fails_helper(char *msgbuf, size_t bufsz)
+int assert_false_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     SASSERT(1 == 2)
     return 0;
 }
 
-int assert_false_fails(char *msgbuf, size_t bufsz)
+int assert_false_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = assert_false_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = assert_false_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int refute_false_passes(char *msgbuf, size_t bufsz)
+int refute_false_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     SREFUTE(1 == 2)
     return 0;
 }
 
-int refute_true_fails_helper(char *msgbuf, size_t bufsz)
+int refute_true_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     SREFUTE(1 == 1)
     return 0;
 }
 
-int refute_true_fails(char *msgbuf, size_t bufsz)
+int refute_true_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = refute_true_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = refute_true_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int assert_null_passes(char *msgbuf, size_t bufsz)
+int assert_null_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     void *n = NULL;
     SASSERT_NULL(n)
     return 0;
 }
 
-int assert_null_fails_helper(char *msgbuf, size_t bufsz)
+int assert_null_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     char *s = "foo";
     SASSERT_NULL(s)
     return 0;
 }
 
-int assert_null_fails(char *msgbuf, size_t bufsz)
+int assert_null_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = assert_null_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = assert_null_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int refute_null_passes(char *msgbuf, size_t bufsz)
+int refute_null_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     char *s = "foo";
     SREFUTE_NULL(s)
     return 0;
 }
 
-int refute_null_fails_helper(char *msgbuf, size_t bufsz)
+int refute_null_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     char *s = NULL;
     SREFUTE_NULL(s)
     return 0;
 }
 
-int refute_null_fails(char *msgbuf, size_t bufsz)
+int refute_null_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = refute_null_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = refute_null_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int assert_equals_passes(char *msgbuf, size_t bufsz)
+int assert_equals_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     SASSERT_EQ(1, 1)
     return 0;
 }
 
-int assert_equals_fails_helper(char *msgbuf, size_t bufsz)
+int assert_equals_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     int a = 1, b = 2;
     SASSERT_EQ(a, b)
     return 0;
 }
 
-int assert_equals_fails(char *msgbuf, size_t bufsz)
+int assert_equals_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = assert_equals_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = assert_equals_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int refute_equals_passes(char *msgbuf, size_t bufsz)
+int refute_equals_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     int a = 1, b = 2;
     SREFUTE_EQ(a, b)
     return 0;
 }
 
-int refute_equals_fails_helper(char *msgbuf, size_t bufsz)
+int refute_equals_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     int a = 1;
     float b = 1.0;
@@ -165,18 +167,18 @@ int refute_equals_fails_helper(char *msgbuf, size_t bufsz)
     return 0;
 }
 
-int refute_equals_fails(char *msgbuf, size_t bufsz)
+int refute_equals_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = refute_equals_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = refute_equals_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int assert_streq_passes(char *msgbuf, size_t bufsz)
+int assert_streq_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     const char *foo = "foo";
     const char *foo2 = "foo";
     const char *fn = NULL;
@@ -187,7 +189,7 @@ int assert_streq_passes(char *msgbuf, size_t bufsz)
     return 0;
 }
 
-int assert_streq_fails_helper(char *msgbuf, size_t bufsz)
+int assert_streq_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     const char *a = "foo", *b = "bar", *n = NULL;
     SASSERT_STREQ(a, b)
@@ -195,18 +197,18 @@ int assert_streq_fails_helper(char *msgbuf, size_t bufsz)
     return 0;
 }
 
-int assert_streq_fails(char *msgbuf, size_t bufsz)
+int assert_streq_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = assert_streq_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = assert_streq_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
 
-int refute_streq_passes(char *msgbuf, size_t bufsz)
+int refute_streq_passes(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
     const char *s1 = "foo", *s2 = "bar";
     const char *n = NULL;
     SREFUTE_STREQ(s1, s2)
@@ -215,18 +217,18 @@ int refute_streq_passes(char *msgbuf, size_t bufsz)
     return 0;
 }
 
-int refute_streq_fails_helper(char *msgbuf, size_t bufsz)
+int refute_streq_fails_helper(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
     const char *s1 = "foo", *s2 = "foo";
     SREFUTE_STREQ(s1, s2)
     return 0;
 }
 
-int refute_streq_fails(char *msgbuf, size_t bufsz)
+int refute_streq_fails(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)
 {
-    strncpy(testname, __func__, testname_sz);
-    int r = refute_streq_fails_helper(msgbuf, bufsz);
-    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, msgbuf);
+    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    int r = refute_streq_fails_helper(_scuttle_msgbuf, _scuttle_msgbufsz);
+    fprintf(stderr, "\t%s inner result:\n\t\t%s\n", __func__, _scuttle_msgbuf);
     SASSERT(r == 1)
     return 0;
 }
