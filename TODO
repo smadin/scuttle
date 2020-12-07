@@ -4,3 +4,4 @@
 - documentation
 - figure out harness generation strategy
     - I think we need a script to build the harness based on file discovery
+- update test_scuttle
