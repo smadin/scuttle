@@ -4,6 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct _scuttle_test
+{
+    char *name;
+    int (*test_fn)(char *, const size_t);
+} Scuttle_Test;
+
+typedef struct _scuttle_suite
+{
+    char *name;
+    void (*setup)();
+    void (*teardown)();
+    Scuttle_Test *tests;
+    size_t num_tests;
+} Scuttle_Suite;
+
 #define _SCUTTLE_STR(x) #x
 #define _SCUTTLE_XSTR(x) _SCUTTLE_STR(x)
 
@@ -87,13 +102,37 @@
         }\
     }
 
-#define STEST_START(x) \
-int _scuttle_test_##x(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz)\
+#define SSUITE_INIT(x) \
+static void _scuttle_suite_test_setup();\
+static void _scuttle_suite_test_teardown ();\
+\
+void _scuttle_suite_init_##x() \
 {\
-    strncpy(_scuttle_testname, __func__, _scuttle_testname_sz);
+    _scuttle_suite_##x.setup = &_scuttle_suite_test_setup;\
+    _scuttle_suite_##x.teardown = &_scuttle_suite_test_teardown;
 
+#define SSUITE_READY \
+}
 
-#define STEST_END\
+#define STEST_SETUP \
+void _scuttle_suite_test_setup ()\
+{
+
+#define STEST_SETUP_END \
+}
+
+#define STEST_TEARDOWN \
+void _scuttle_suite_test_teardown ()\
+{
+
+#define STEST_TEARDOWN_END \
+}
+
+#define STEST_START(x) \
+int _scuttle_test_##x(char *_scuttle_msgbuf, const size_t _scuttle_msgbufsz)\
+{
+
+#define STEST_END \
     return 0;\
 }
 

@@ -2,8 +2,8 @@
 #include "scuttle.h"
 #include <stdio.h>
 
-static char _scuttle_testname[256];
-static size_t _scuttle_testname_sz = 256;
+char _scuttle_testname[256];
+size_t _scuttle_testname_sz = 256;
 
 int main(int argc, char **argv)
 {
