@@ -1,4 +1,6 @@
+- suites
+- per-suite setup and teardown
+- per-test setup and teardown
 - documentation
 - figure out harness generation strategy
     - I think we need a script to build the harness based on file discovery
-- better variable names in macros?
