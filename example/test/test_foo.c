@@ -1,5 +1,5 @@
 #include "foo.h"
-#include "test_example_foo.h"
+#include "test_foo.h"
 #include "scuttle.h"
 #include <stdio.h>
 
@@ -15,12 +15,12 @@ STEST_TEARDOWN
     printf("example_foo test teardown\n");
 STEST_TEARDOWN_END
 
-STEST_START(foo_return_true)
+STEST_START(foo_returns_fortytwo)
     int i = foo();
     SASSERT_EQ(42, i)
 STEST_END
 
-STEST_START(foo_return_false)
+STEST_START(foo_doesnt_return_sixtynine)
     int i = foo();
     SREFUTE(i == 69)
 STEST_END
