@@ -1,7 +1,7 @@
-- suites
-- per-suite setup and teardown
-- per-test setup and teardown
 - documentation
-- figure out harness generation strategy
-    - I think we need a script to build the harness based on file discovery
 - update test_scuttle
+    - dogfood the whole thing
+    - separate suites for assert/refute, null, equal, string equal
+    - might need to update script/makefile generation since scuttle/ root has no obj/ dir
+    - should scuttle "installation" just consist of copying the header locally? should the script check for the header?
+    - the script should check for the header.
