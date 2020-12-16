@@ -2,7 +2,46 @@
 
 shopt -s extglob
 
+SCUTTLE_SCRIPT_VER="1.0.0"
+
 function scuttle() {
+
+    function checkVer() {
+        unset extraInc
+        unset verMismatch
+        if [[ -f "/usr/include/scuttle.h" || -f "/usr/local/include/scuttle.h" ]]; then
+            scuttleInclude="#include <scuttle.h>"
+        else
+            scuttleInclude="#include \"scuttle.h\""
+            scincLoc=$(dirname $(find . -name scuttle.h))
+            extraInc="-I$scincLoc"
+        fi
+        checkVerTmpDir=$(mktemp -d)
+        checkVerTmpFile="$checkVerTmpDir/checkver.c"
+        cat <<\EOF |
+<<scuttleinc>>
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+    printf("%s\n", SCUTTLE_VERSION_STRING);
+    return 0;
+}
+EOF
+        sed -e "s/<<scuttleinc>>/$scuttleInclude/" > $checkVerTmpFile
+        cc $extraInc -o $checkVerTmpDir/checkver $checkVerTmpFile
+        scuttleHeaderVer=$($checkVerTmpDir/checkver)
+        if [[ "$scuttleHeaderVer" != "$SCUTTLE_SCRIPT_VER" ]]; then
+            verMismatch="scuttle version mismatch"
+        fi
+
+        rm -rf $checkVerTmpDir
+    }
+
+    function printVerMismatch()
+    {
+        echo "scuttle.h version is $scuttleHeaderVer but scuttle.sh version is $SCUTTLE_SCRIPT_VER"
+    }
 
     function parseOpts() {
         unset doHelp
@@ -230,11 +269,14 @@ EOF
         sed -e "s/<<projname>>/$projName/g" >> $makefile
     }
 
+    checkVer
+    [[ -n "$verMismatch" ]] && printVerMismatch && return 0
+
+    echo "This is Scuttle, version $SCUTTLE_SCRIPT_VER"
+
     parseOpts "$@"
     [[ "$doHelp" == "true" ]] && printUsage && return 0
     [[ -z "$testDir" ]] && echo "test directory not specified, using default ./test" && testDir="./test"
-    echo "noObjs=$noObjs"
-    echo "testDir=$testDir"
 
     if [[ ! -d "$testDir" ]]; then # no test dir
         echo "Scuttle: ERROR: test directory $testDir not found."
