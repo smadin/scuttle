@@ -1,7 +1,7 @@
-.PHONY: all dirs clean install
+.PHONY: all clean install
 
 all:
-	dirs test
+	test
 
 test:
 	bash src/scuttle.sh test
@@ -17,6 +17,3 @@ clean:
 install:
 	install -g root -o root -m 644 include/scuttle.h /usr/local/include/
 	install -g root -o root -m 644 -D -t /usr/local/lib/scuttle src/scuttle.sh
-
-dirs:
-	mkdir -p obj lib test/obj test/bin
