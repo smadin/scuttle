@@ -1,7 +1,3 @@
-- documentation
-- update test_scuttle
-    - dogfood the whole thing
-    - separate suites for assert/refute, null, equal, string equal
-    - might need to update script/makefile generation since scuttle/ root has no obj/ dir
-    - should scuttle "installation" just consist of copying the header locally? should the script check for the header?
-    - the script should check for the header.
+- more detailed documentation
+- clean up scuttle.sh?
+- more detailed example
