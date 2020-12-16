@@ -1,6 +1,5 @@
 #include "bar.h"
 #include "test_bar.h"
-#include "scuttle.h"
 #include <stdio.h>
 
 SSUITE_INIT(example_bar)

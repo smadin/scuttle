@@ -1,6 +1,5 @@
 #include "foo.h"
 #include "test_foo.h"
-#include "scuttle.h"
 #include <stdio.h>
 
 SSUITE_INIT(example_foo)
