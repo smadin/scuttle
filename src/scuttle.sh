@@ -1,28 +1,43 @@
 #!/usr/bin/bash
 
-# scuttle assumes it is being invoked from the root directory of the project,
-# and that test source files are in test/ or the directory specified on the command line.
-
-# TODO
-# - check test dir
-# - parse test source files
-# - build suites of test cases
-# - generate headers per suite
-# - generate harness
-# - generate testdir Makefile!
-# - build and run harness
-
-# syntax: bash scuttle.sh [<testdir>]
-# if <testdir> not provided, assume 'test'
+shopt -s extglob
 
 function scuttle() {
+
+    function parseOpts() {
+        unset doHelp
+        unset noObjs
+        unset testDir
+
+        # -h or -? prints usage and exits
+        # -o suppresses check for ./obj
+        # any other arg is assumed to override the test dir name
+        # more than one other arg is an error
+        for arg in "$@"; do
+            case "$arg" in
+                -h | -\?)   doHelp="true"
+                    ;;
+                -o)         noObjs="true"
+                    ;;
+                *)          if [[ -z "$testDir" ]]; then
+                                testDir="$arg"
+                            else
+                                doHelp="true"
+                            fi
+                    ;;
+            esac
+        done
+    }
+
     function printUsage() {
-        echo "Scuttle: simple C unit tests"
-        echo "Usage:"
+        echo "Scuttle - simple C unit tests"
+        echo ""
         echo "Run Scuttle from the root of your project tree. Scuttle expects to find headers in ./include and object files in ./obj."
-        echo "scuttle.sh [-h] [testDir]"
+        echo "Scuttle generates headers, source files, and a Makefile in the test directory."
+        echo "bash scuttle.sh [-h] [-o] [testDir]"
         echo "----------"
         echo "-h: print this message"
+        echo "-o: don't check for ./obj subdirectory (when tests don't require compiled objects)"
         echo "testDir: subdirectory of project tree where test suites are located, or 'test' by default"
     }
 
@@ -161,24 +176,33 @@ EOF
     }
 
     function writeMakefile() {
+        echo "writeMakefile: noObjs = $noObjs"
         makefile="$testDir/Makefile"
-
-
         # Makefile
         cat <<\EOF > $makefile
 CFLAGS=-g -Wall -Werror -I../../include -I../include -I.
+EOF
+        if [[ "$noObjs" != "true" ]]; then
+            cat <<\EOF >> $makefile
 PROJOBJS= \
 EOF
-        for suiteName in $suiteNames; do
-            echo "	../obj/$suiteName.o \\" >> $makefile
-        done
-        echo "" >> $makefile
+            for suiteName in $suiteNames; do
+                echo "	../obj/$suiteName.o \\" >> $makefile
+            done
+            echo "" >> $makefile
+        fi
 
         echo "TESTOBJS= \\" >> $makefile
         for suiteName in $suiteNames; do
             echo "	obj/test_$suiteName.o obj/test_${suiteName}_gen.o \\" >> $makefile
         done
         echo "" >> $makefile
+
+        if [[ "$noObjs" == "true" ]]; then
+            echo "OBJS=\$(TESTOBJS)" >> $makefile
+        else
+            echo "OBJS=\$(TESTOBJS) \$(PROJOBJS)" >> $makefile
+        fi
 
         cat <<\EOF |
 
@@ -193,7 +217,7 @@ dirs:
 obj/%.o: %.c
 	gcc $(CFLAGS) -o $@ -c $<
 
-bin/test_<<projname>>: obj/test_<<projname>>.o $(TESTOBJS) $(PROJOBJS)
+bin/test_<<projname>>: obj/test_<<projname>>.o $(OBJS)
 EOF
         sed -e "s/<<projname>>/$projName/g" >> $makefile
 
@@ -206,26 +230,19 @@ EOF
         sed -e "s/<<projname>>/$projName/g" >> $makefile
     }
 
-    if [[ -z "$1" ]]; then # no param
-        if [[ ! -d ./test ]]; then # no test dir
-            echo "Scuttle: ERROR: default test directory ./test not found."
-            printUsage
-            return 0
-        else
-            testDir="test"
-        fi
-    elif [[ "$1" =~ ^-(-)?[hH?] ]]; then # help
+    parseOpts "$@"
+    [[ "$doHelp" == "true" ]] && printUsage && return 0
+    [[ -z "$testDir" ]] && echo "test directory not specified, using default ./test" && testDir="./test"
+    echo "noObjs=$noObjs"
+    echo "testDir=$testDir"
+
+    if [[ ! -d "$testDir" ]]; then # no test dir
+        echo "Scuttle: ERROR: test directory $testDir not found."
         printUsage
         return 0
-    elif [[ ! -d "./$1" ]]; then # specified test dir doesn't exist
-        echo "Scuttle: ERROR: specified test directory ./$1 not found."
-        printUsage
-        return 0
-    else # param specifies test dir
-        testDir="$1"
     fi
 
-    if [[ ! -d "./include" || ! -d "./obj" ]]; then
+    if [[ ! -d "./include" || ! ( "$noObjs" == "true" || -d "./obj" ) ]]; then
         echo "Scuttle: ERROR: ./include and ./obj directories must be present"
         printUsage
         return 0
@@ -254,4 +271,4 @@ EOF
     return 0
 }
 
-scuttle "$1"
+scuttle "$@"

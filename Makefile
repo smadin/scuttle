@@ -1,21 +1,22 @@
-CC=c99
-CFLAGS=-g -Wall -Werror -Iinclude/
-LDFLAGS=-g -Iinclude/
+.PHONY: all dirs clean install
 
 all:
-	dirs library test
+	dirs test
 
-library: dirs
+test:
+	bash src/scuttle.sh test
+	$(MAKE) -C test
+	cat test/log/test_scuttle.log
 
-test: library
-	$(CC) $(CFLAGS) -Itest/ -c -o test/obj/test_scuttle.o test/test_scuttle.c
-	$(CC) $(LDFLAGS) -Itest/ -o test/bin/test_scuttle test/obj/test_scuttle.o
-	test/bin/test_scuttle
+example:
+	$(MAKE) -C example test
 
 clean:
 	rm -rf obj lib test/obj test/bin
 
-install: library
+install:
+	install -g root -o root -m 644 include/scuttle.h /usr/local/include/
+	install -g root -o root -m 644 -D -t /usr/local/lib/scuttle src/scuttle.sh
 
 dirs:
 	mkdir -p obj lib test/obj test/bin

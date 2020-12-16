@@ -54,13 +54,13 @@ typedef struct _scuttle_suite
 
 #define SASSERT_EQ(x, y) \
     if (x != y) {\
-        snprintf(_scuttle_msgbuf, _scuttle_msgbufsz, "Assertion failure: expected " #x " (" _SCUTTLE_XSTR(x) ") to equal " #y " (" _SCUTTLE_XSTR(y) ")");\
+        snprintf(_scuttle_msgbuf, _scuttle_msgbufsz, "Assertion failure: expected " #x " (%1.2f) to equal " #y " (%1.2f)", (double)x, (double)y);\
         return 1;\
     }
 
 #define SREFUTE_EQ(x, y) \
     if (x == y) {\
-        snprintf(_scuttle_msgbuf, _scuttle_msgbufsz, "Assertion failure: expected " #x " (" _SCUTTLE_XSTR(x) ") not to equal " #y " (" _SCUTTLE_XSTR(y) ")");\
+        snprintf(_scuttle_msgbuf, _scuttle_msgbufsz, "Assertion failure: expected " #x " (%1.2f) not to equal " #y " (%1.2f)", (double)x, (double)y);\
         return 1;\
     }
 
