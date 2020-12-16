@@ -1,18 +1,19 @@
-.PHONY: all clean install
+.PHONY: all clean install test example
 
 all:
 	test
 
 test:
-	bash src/scuttle.sh test
+	bash src/scuttle.sh -o test
 	$(MAKE) -C test
 	cat test/log/test_scuttle.log
 
 example:
-	$(MAKE) -C example test
+	$(MAKE) -C example all test
 
 clean:
-	rm -rf obj lib test/obj test/bin
+	$(MAKE) -C test clean
+	rm -rf obj lib
 
 install:
 	install -g root -o root -m 644 include/scuttle.h /usr/local/include/

@@ -1,11 +1,17 @@
 #!/usr/bin/bash
 
+# Scuttle generates unit test scaffolding, letting the developer write only the test suites themselves.
+# Dependencies are minimal: this script, scuttle.h, bash, GNU make, and a modern C compiler.
+# See README.md for more information.
+
 shopt -s extglob
 
 SCUTTLE_SCRIPT_VER="1.0.0"
 
 function scuttle() {
 
+    # checkVer finds the version of the Scuttle header and checks it against this script.
+    # it also determines whether the Scuttle header is installed system-wide or only locally.
     function checkVer() {
         unset extraInc
         unset verMismatch
@@ -90,6 +96,7 @@ EOF
         testNames=$(grep STEST_START "$testDir/$suiteFileName" | sed -e 's/STEST_START(//' -e 's/)//')
     }
 
+    # writes out the header file test_<suite>.h for a test suite source file test_<suite>.c
     function writeSuiteHeader() {
         suiteCaps=$(echo "$suiteName" | tr '[:lower:]' '[:upper:]')
         suiteHeader="$testDir/test_$suiteName.h"
@@ -98,14 +105,14 @@ EOF
 #ifndef _SCUTTLE_TEST_<<SUITENAME>>_H
 #define _SCUTTLE_TEST_<<SUITENAME>>_H
 
-#include "scuttle.h"
+<<scuttleinc>>
 
 void _scuttle_suite_init_<<projname>>_<<suitename>>();
 void _scuttle_suite_test_setup_<<projname>>_<<suitename>>();
 void _scuttle_suite_test_teardown_<<projname>>_<<suitename>>();
 
 EOF
-        sed -e "s/<<projname>>/$projName/" -e "s/<<SUITENAME>>/$suiteCaps/" -e "s/<<suitename>>/$suiteName/" > $suiteHeader
+        sed -e "s/<<scuttleinc>>/$scuttleInclude/" -e "s/<<projname>>/$projName/" -e "s/<<SUITENAME>>/$suiteCaps/" -e "s/<<suitename>>/$suiteName/" > $suiteHeader
         for testName in $testNames; do
             echo "int _scuttle_test_${testName}(char *_scuttle_msgbuf, size_t _scuttle_msgbufsz);" >> $suiteHeader
         done
@@ -120,6 +127,8 @@ EOF
         sed -e "s/<<projname>>/$projName/" -e "s/<<SUITENAME>>/$suiteCaps/" -e "s/<<suitename>>/$suiteName/" >> $suiteHeader
     }
 
+    # writes out the generated data file test_<suite>_gen.c file for a given test suite source file test_<suite>.c
+    # the *_gen.c files define the arrays of test cases the harness will iterate through.
     function writeSuiteData() {
         suiteData="$testDir/test_${suiteName}_gen.c"
         # test suite data
@@ -153,6 +162,7 @@ EOF
         sed -e "s/<<projname>>/$projName/" -e "s/<<suitename>>/$suiteName/" -e "s/<<numtests>>/$numTests/" >> $suiteData
     }
 
+    # writes out the test harness that drives the testing process, calls all the tests suite-by-suite, and outputs the results.
     function writeHarness() {
         testHarness="$testDir/test_$projName.c"
         # test harness
@@ -167,6 +177,9 @@ EOF
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     Scuttle_Suite suites[] = {
 EOF
         for suiteName in $suiteNames; do
@@ -208,19 +221,25 @@ EOF
         printf("*** Suite %s: %lu / %lu tests passed.\n", suite_fail ? "failed" : "passed", (suitep->num_tests - failct), suitep->num_tests);
     }
 
-    printf("*** %lu / %lu suites passed\n", (suitect - suite_failct), suitect);
+    printf("*** %lu / %lu suites passed.\n", (suitect - suite_failct), suitect);
     return 0;
 }
 EOF
     }
 
+    # writes out the Makefile that builds the test harness binary.
     function writeMakefile() {
-        echo "writeMakefile: noObjs = $noObjs"
         makefile="$testDir/Makefile"
         # Makefile
         cat <<\EOF > $makefile
-CFLAGS=-g -Wall -Werror -I../../include -I../include -I.
+ifneq (,$(shell which clang))
+CC=clang
+else ifneq (,$(shell which gcc))
+CC=gcc
+endif
+
 EOF
+        echo "CFLAGS=-g -Wall -Wextra -Werror -std=c99 -I../include -I. $extraInc" >> $makefile
         if [[ "$noObjs" != "true" ]]; then
             cat <<\EOF >> $makefile
 PROJOBJS= \
@@ -254,14 +273,14 @@ dirs:
 	mkdir -p obj bin log
 
 obj/%.o: %.c
-	gcc $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 bin/test_<<projname>>: obj/test_<<projname>>.o $(OBJS)
 EOF
         sed -e "s/<<projname>>/$projName/g" >> $makefile
 
         cat <<\EOF |
-	gcc $(CFLAGS) -o $@ $^
+	$(CC) -o $@ $^
 
 clean:
 	rm -rf *.h *_gen.c test_<<projname>>.c obj bin
