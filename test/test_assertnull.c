@@ -1,5 +1,4 @@
 #include "test_assertnull.h"
-#include "scuttle.h"
 #include <stdio.h>
 
 SSUITE_INIT(scuttle_assertnull)

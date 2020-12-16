@@ -1,5 +1,4 @@
 #include "test_assertstreq.h"
-#include "scuttle.h"
 #include <stdio.h>
 
 SSUITE_INIT(scuttle_assertstreq)

@@ -1,5 +1,4 @@
 #include "test_asserteq.h"
-#include "scuttle.h"
 #include <stdio.h>
 
 SSUITE_INIT(scuttle_asserteq)
