@@ -6,7 +6,7 @@
 
 shopt -s extglob
 
-SCUTTLE_SCRIPT_VER="1.0.0"
+SCUTTLE_SCRIPT_VER="1.0.1"
 
 function scuttle() {
 
