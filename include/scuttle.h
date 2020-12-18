@@ -1,6 +1,7 @@
 #ifndef _SCUTTLE_H
 #define _SCUTTLE_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,7 +25,7 @@ typedef struct _scuttle_suite
 
 #define _SCUTTLE_VER_MAJ 1
 #define _SCUTTLE_VER_MIN 0
-#define _SCUTTLE_VER_PAT 0
+#define _SCUTTLE_VER_PAT 1
 #define SCUTTLE_VERSION_STRING ("" _SCUTTLE_XSTR(_SCUTTLE_VER_MAJ) "." _SCUTTLE_XSTR(_SCUTTLE_VER_MIN) "." _SCUTTLE_XSTR(_SCUTTLE_VER_PAT))
 #define SCUTTLE_VERSION_INT (_SCUTTLE_VER_PAT + 1000 * (_SCUTTLE_VER_MIN + 100 * _SCUTTLE_VER_MAJ))
 
